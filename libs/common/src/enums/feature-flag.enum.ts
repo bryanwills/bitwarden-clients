@@ -25,7 +25,6 @@ export enum FeatureFlag {
   PM4154_BulkEncryptionService = "PM-4154-bulk-encryption-service",
   EmailVerification = "email-verification",
   TwoFactorComponentRefactor = "two-factor-component-refactor",
-  ProviderClientVaultPrivacyBanner = "ac-2833-provider-client-vault-privacy-banner",
   VaultBulkManagementAction = "vault-bulk-management-action",
   IdpAutoSubmitLogin = "idp-auto-submit-login",
   UnauthenticatedExtensionUIRefresh = "unauth-ui-refresh",
@@ -47,6 +46,7 @@ export enum FeatureFlag {
   PM12443RemovePagingLogic = "pm-12443-remove-paging-logic",
   PrivateKeyRegeneration = "pm-12241-private-key-regeneration",
   ResellerManagedOrgAlert = "PM-15814-alert-owners-of-reseller-managed-orgs",
+  AccountDeprovisioningBanner = "pm-17120-account-deprovisioning-admin-console-banner",
 }
 
 export type AllowedFeatureFlagTypes = boolean | number | string;
@@ -82,7 +82,6 @@ export const DefaultFeatureFlagValue = {
   [FeatureFlag.PM4154_BulkEncryptionService]: FALSE,
   [FeatureFlag.EmailVerification]: FALSE,
   [FeatureFlag.TwoFactorComponentRefactor]: FALSE,
-  [FeatureFlag.ProviderClientVaultPrivacyBanner]: FALSE,
   [FeatureFlag.VaultBulkManagementAction]: FALSE,
   [FeatureFlag.IdpAutoSubmitLogin]: FALSE,
   [FeatureFlag.UnauthenticatedExtensionUIRefresh]: FALSE,
@@ -104,6 +103,7 @@ export const DefaultFeatureFlagValue = {
   [FeatureFlag.PM12443RemovePagingLogic]: FALSE,
   [FeatureFlag.PrivateKeyRegeneration]: FALSE,
   [FeatureFlag.ResellerManagedOrgAlert]: FALSE,
+  [FeatureFlag.AccountDeprovisioningBanner]: true,
 } satisfies Record<FeatureFlag, AllowedFeatureFlagTypes>;
 
 export type DefaultFeatureFlagValueType = typeof DefaultFeatureFlagValue;

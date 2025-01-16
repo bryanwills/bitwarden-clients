@@ -30,6 +30,8 @@ import { OrgSwitcherComponent } from "../../../layouts/org-switcher/org-switcher
 import { WebLayoutModule } from "../../../layouts/web-layout.module";
 import { AdminConsoleLogo } from "../../icons/admin-console-logo";
 
+import { AccountDeprovisioningBannerService } from "./services/account-deprovisioning-banner.service";
+
 @Component({
   selector: "app-organization-layout",
   templateUrl: "organization-layout.component.html",
@@ -59,6 +61,8 @@ export class OrganizationLayoutComponent implements OnInit {
   organizationIsUnmanaged$: Observable<boolean>;
   enterpriseOrganization$: Observable<boolean>;
 
+  showAccountDeprovisioningBanner$: Observable<boolean>;
+
   constructor(
     private route: ActivatedRoute,
     private organizationService: OrganizationService,
@@ -66,6 +70,7 @@ export class OrganizationLayoutComponent implements OnInit {
     private configService: ConfigService,
     private policyService: PolicyService,
     private providerService: ProviderService,
+    protected bannerService: AccountDeprovisioningBannerService,
   ) {}
 
   async ngOnInit() {
@@ -76,6 +81,12 @@ export class OrganizationLayoutComponent implements OnInit {
       switchMap((id) => this.organizationService.organizations$.pipe(getById(id))),
       filter((org) => org != null),
     );
+
+    this.showAccountDeprovisioningBanner$ = combineLatest([
+      this.bannerService.showBanner$,
+      this.configService.getFeatureFlag$(FeatureFlag.AccountDeprovisioningBanner),
+      this.organization$,
+    ]).pipe(map(([show, flag, organizaiton]) => organizaiton.isAdmin && show != false && flag));
 
     this.canAccessExport$ = this.organization$.pipe(map((org) => org.canAccessExport));
 
