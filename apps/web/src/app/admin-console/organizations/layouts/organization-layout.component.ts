@@ -20,9 +20,9 @@ import { PolicyService } from "@bitwarden/common/admin-console/abstractions/poli
 import { ProviderService } from "@bitwarden/common/admin-console/abstractions/provider.service";
 import { PolicyType, ProviderStatusType } from "@bitwarden/common/admin-console/enums";
 import { Organization } from "@bitwarden/common/admin-console/models/domain/organization";
-import { ProductTierType } from "@bitwarden/common/billing/enums";
 import { AccountService } from "@bitwarden/common/auth/abstractions/account.service";
 import { getUserId } from "@bitwarden/common/auth/services/account.service";
+import { ProductTierType } from "@bitwarden/common/billing/enums";
 import { FeatureFlag } from "@bitwarden/common/enums/feature-flag.enum";
 import { ConfigService } from "@bitwarden/common/platform/abstractions/config/config.service";
 import { PlatformUtilsService } from "@bitwarden/common/platform/abstractions/platform-utils.service";
@@ -80,7 +80,7 @@ export class OrganizationLayoutComponent implements OnInit {
   async ngOnInit() {
     document.body.classList.remove("layout_frontend");
 
-    const userId = await firstValueFrom(this.accountService.activeAccount$.pipe(getUserId);
+    const userId = await firstValueFrom(this.accountService.activeAccount$.pipe(getUserId));
     this.organization$ = this.route.params.pipe(
       map((p) => p.organizationId),
       switchMap((id) => this.organizationService.organizations$(userId).pipe(getById(id))),
