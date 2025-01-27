@@ -20,6 +20,7 @@ import { PolicyService } from "@bitwarden/common/admin-console/abstractions/poli
 import { ProviderService } from "@bitwarden/common/admin-console/abstractions/provider.service";
 import { PolicyType, ProviderStatusType } from "@bitwarden/common/admin-console/enums";
 import { Organization } from "@bitwarden/common/admin-console/models/domain/organization";
+import { ProductTierType } from "@bitwarden/common/billing/enums";
 import { FeatureFlag } from "@bitwarden/common/enums/feature-flag.enum";
 import { ConfigService } from "@bitwarden/common/platform/abstractions/config/config.service";
 import { PlatformUtilsService } from "@bitwarden/common/platform/abstractions/platform-utils.service";
@@ -86,7 +87,15 @@ export class OrganizationLayoutComponent implements OnInit {
       this.bannerService.showBanner$,
       this.configService.getFeatureFlag$(FeatureFlag.AccountDeprovisioningBanner),
       this.organization$,
-    ]).pipe(map(([show, flag, organizaiton]) => organizaiton.isAdmin && show != false && flag));
+    ]).pipe(
+      map(
+        ([dismissedOrgs, featureFlagEnabled, organization]) =>
+          organization.productTierType === ProductTierType.Enterprise &&
+          organization.isAdmin &&
+          !dismissedOrgs?.includes(organization.id) &&
+          featureFlagEnabled,
+      ),
+    );
 
     this.canAccessExport$ = this.organization$.pipe(map((org) => org.canAccessExport));
 

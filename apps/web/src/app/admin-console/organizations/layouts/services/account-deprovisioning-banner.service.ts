@@ -1,12 +1,13 @@
 import { Injectable } from "@angular/core";
 
+import { Organization } from "@bitwarden/common/admin-console/models/domain/organization";
 import {
   ACCOUNT_DEPROVISIONING_BANNER_DISK,
   StateProvider,
   UserKeyDefinition,
 } from "@bitwarden/common/platform/state";
 
-export const SHOW_BANNER_KEY = new UserKeyDefinition<boolean>(
+export const SHOW_BANNER_KEY = new UserKeyDefinition<string[]>(
   ACCOUNT_DEPROVISIONING_BANNER_DISK,
   "accountDeprovisioningBanner",
   {
@@ -23,7 +24,14 @@ export class AccountDeprovisioningBannerService {
 
   constructor(private stateProvider: StateProvider) {}
 
-  async hideBanner() {
-    await this._showBanner.update(() => false);
+  async hideBanner(organization: Organization) {
+    await this._showBanner.update((state) => {
+      if (!state) {
+        state = [organization.id];
+      } else if (!state.includes(organization.id)) {
+        state.push(organization.id);
+      }
+      return state;
+    });
   }
 }
