@@ -13,7 +13,7 @@ component_management:
         - libs/key-management/**
         - libs/common/src/key-management/**
     - component_id: key-management-browser
-      name: Key Management - Browser
+      name: Key Management - Browser Extension
       paths:
         - apps/browser/src/key-management/**
         - apps/browser/src/background/nativeMessaging.background.ts
@@ -26,7 +26,7 @@ component_management:
       paths:
         - apps/web/src/app/key-management/**
     - component_id: key-management-desktop
-      name: Key Management - Desktop
+      name: Key Management - Desktop App
       paths:
         - apps/desktop/src/key-management/**
         - apps/desktop/destkop_native/core/src/biometric/**
