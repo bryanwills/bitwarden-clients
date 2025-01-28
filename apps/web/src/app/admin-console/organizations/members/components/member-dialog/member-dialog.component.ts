@@ -53,6 +53,7 @@ import {
   convertToSelectionView,
   PermissionMode,
 } from "../../../shared/components/access-selector";
+import { DeleteManagedUserWarningService } from "../../services/delete-managed-member/delete-managed-member-warning.service";
 
 import { commaSeparatedEmails } from "./validators/comma-separated-emails.validator";
 import { inputEmailLimitValidator } from "./validators/input-email-limit.validator";
@@ -176,6 +177,7 @@ export class MemberDialogComponent implements OnDestroy {
     organizationService: OrganizationService,
     private toastService: ToastService,
     private configService: ConfigService,
+    private deleteManagedUserWarningService: DeleteManagedUserWarningService,
   ) {
     this.organization$ = accountService.activeAccount$.pipe(
       switchMap((account) =>
@@ -639,6 +641,27 @@ export class MemberDialogComponent implements OnDestroy {
       return;
     }
 
+    const showWarningDialog = combineLatest([
+      this.organization$,
+      this.deleteManagedUserWarningService.acknowledged$,
+      this.accountDeprovisioningEnabled$,
+    ]).pipe(
+      map(
+        ([organization, acknowledged, featureFlagEnabled]) =>
+          featureFlagEnabled &&
+          organization.isOwner &&
+          organization.productTierType === ProductTierType.Enterprise &&
+          !acknowledged,
+      ),
+    );
+
+    if (await firstValueFrom(showWarningDialog)) {
+      const acknowledged = await this.deleteManagedUserWarningService.showWarning();
+      if (!acknowledged) {
+        return;
+      }
+    }
+
     const confirmed = await this.dialogService.openSimpleDialog({
       title: {
         key: "deleteOrganizationUser",
@@ -667,6 +690,10 @@ export class MemberDialogComponent implements OnDestroy {
       title: null,
       message: this.i18nService.t("organizationUserDeleted", this.params.name),
     });
+
+    if (await firstValueFrom(this.accountDeprovisioningEnabled$)) {
+      await this.deleteManagedUserWarningService.acknowledgeWarning();
+    }
     this.close(MemberDialogResult.Deleted);
   };
 
