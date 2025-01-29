@@ -11,7 +11,7 @@ import { UserId } from "@bitwarden/common/types/guid";
 
 import { AccountDeprovisioningBannerService } from "./account-deprovisioning-banner.service";
 
-describe("Is Enterprise Org Guard", () => {
+describe("Account Deprovisioning Banner Service", () => {
   const userId = Utils.newGuid() as UserId;
   let accountService: FakeAccountService;
   let stateProvider: FakeStateProvider;
