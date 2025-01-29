@@ -3,7 +3,7 @@
 import { CommonModule } from "@angular/common";
 import { Component, OnInit } from "@angular/core";
 import { ActivatedRoute, RouterModule } from "@angular/router";
-import { combineLatest, filter, firstValueFrom, map, Observable, switchMap } from "rxjs";
+import { combineLatest, filter, map, Observable, switchMap, withLatestFrom } from "rxjs";
 
 import { JslibModule } from "@bitwarden/angular/jslib.module";
 import {
@@ -80,10 +80,12 @@ export class OrganizationLayoutComponent implements OnInit {
   async ngOnInit() {
     document.body.classList.remove("layout_frontend");
 
-    const userId = await firstValueFrom(this.accountService.activeAccount$.pipe(getUserId));
     this.organization$ = this.route.params.pipe(
       map((p) => p.organizationId),
-      switchMap((id) => this.organizationService.organizations$(userId).pipe(getById(id))),
+      withLatestFrom(this.accountService.activeAccount$.pipe(getUserId)),
+      switchMap(([orgId, userId]) =>
+        this.organizationService.organizations$(userId).pipe(getById(orgId)),
+      ),
       filter((org) => org != null),
     );
 
