@@ -26,10 +26,13 @@ export class AccountDeprovisioningBannerService {
 
   async hideBanner(organization: Organization) {
     await this._showBanner.update((state) => {
+      if (!organization) {
+        return state;
+      }
       if (!state) {
-        state = [organization.id];
+        return [organization.id];
       } else if (!state.includes(organization.id)) {
-        state.push(organization.id);
+        return [...state, organization.id];
       }
       return state;
     });
