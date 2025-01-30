@@ -81,7 +81,7 @@ import {
   ResetPasswordComponent,
   ResetPasswordDialogResult,
 } from "./components/reset-password.component";
-import { DeleteManagedUserWarningService } from "./services/delete-managed-member/delete-managed-member-warning.service";
+import { DeleteManagedMemberWarningService } from "./services/delete-managed-member/delete-managed-member-warning.service";
 
 class MembersTableDataSource extends PeopleTableDataSource<OrganizationUserView> {
   protected statusType = OrganizationUserStatusType;
@@ -139,7 +139,7 @@ export class MembersComponent extends BaseMembersComponent<OrganizationUserView>
     private collectionService: CollectionService,
     private billingApiService: BillingApiServiceAbstraction,
     private configService: ConfigService,
-    protected deleteManagedUserWarningService: DeleteManagedUserWarningService,
+    protected deleteManagedMemberWarningService: DeleteManagedMemberWarningService,
   ) {
     super(
       apiService,
@@ -589,7 +589,7 @@ export class MembersComponent extends BaseMembersComponent<OrganizationUserView>
   async bulkDelete() {
     if (this.accountDeprovisioningEnabled) {
       const warningAcknowledged = await firstValueFrom(
-        this.deleteManagedUserWarningService.acknowledged$,
+        this.deleteManagedMemberWarningService.warningAcknowledged(this.organization.id),
       );
 
       if (
@@ -597,7 +597,7 @@ export class MembersComponent extends BaseMembersComponent<OrganizationUserView>
         this.organization.isOwner &&
         this.organization.productTierType === ProductTierType.Enterprise
       ) {
-        const acknowledged = await this.deleteManagedUserWarningService.showWarning();
+        const acknowledged = await this.deleteManagedMemberWarningService.showWarning();
         if (!acknowledged) {
           return;
         }
@@ -795,7 +795,7 @@ export class MembersComponent extends BaseMembersComponent<OrganizationUserView>
   async deleteUser(user: OrganizationUserView) {
     if (this.accountDeprovisioningEnabled) {
       const warningAcknowledged = await firstValueFrom(
-        this.deleteManagedUserWarningService.acknowledged$,
+        this.deleteManagedMemberWarningService.warningAcknowledged(this.organization.id),
       );
 
       if (
@@ -803,7 +803,7 @@ export class MembersComponent extends BaseMembersComponent<OrganizationUserView>
         this.organization.isOwner &&
         this.organization.productTierType === ProductTierType.Enterprise
       ) {
-        const acknowledged = await this.deleteManagedUserWarningService.showWarning();
+        const acknowledged = await this.deleteManagedMemberWarningService.showWarning();
         if (!acknowledged) {
           return false;
         }
@@ -829,7 +829,7 @@ export class MembersComponent extends BaseMembersComponent<OrganizationUserView>
     }
 
     if (this.accountDeprovisioningEnabled) {
-      await this.deleteManagedUserWarningService.acknowledgeWarning();
+      await this.deleteManagedMemberWarningService.acknowledgeWarning(this.organization.id);
     }
 
     this.actionPromise = this.organizationUserApiService.deleteOrganizationUser(

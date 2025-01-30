@@ -53,7 +53,7 @@ import {
   convertToSelectionView,
   PermissionMode,
 } from "../../../shared/components/access-selector";
-import { DeleteManagedUserWarningService } from "../../services/delete-managed-member/delete-managed-member-warning.service";
+import { DeleteManagedMemberWarningService } from "../../services/delete-managed-member/delete-managed-member-warning.service";
 
 import { commaSeparatedEmails } from "./validators/comma-separated-emails.validator";
 import { inputEmailLimitValidator } from "./validators/input-email-limit.validator";
@@ -177,7 +177,7 @@ export class MemberDialogComponent implements OnDestroy {
     organizationService: OrganizationService,
     private toastService: ToastService,
     private configService: ConfigService,
-    private deleteManagedUserWarningService: DeleteManagedUserWarningService,
+    private deleteManagedMemberWarningService: DeleteManagedMemberWarningService,
   ) {
     this.organization$ = accountService.activeAccount$.pipe(
       switchMap((account) =>
@@ -643,7 +643,7 @@ export class MemberDialogComponent implements OnDestroy {
 
     const showWarningDialog = combineLatest([
       this.organization$,
-      this.deleteManagedUserWarningService.acknowledged$,
+      this.deleteManagedMemberWarningService.warningAcknowledged(this.params.organizationId),
       this.accountDeprovisioningEnabled$,
     ]).pipe(
       map(
@@ -656,7 +656,7 @@ export class MemberDialogComponent implements OnDestroy {
     );
 
     if (await firstValueFrom(showWarningDialog)) {
-      const acknowledged = await this.deleteManagedUserWarningService.showWarning();
+      const acknowledged = await this.deleteManagedMemberWarningService.showWarning();
       if (!acknowledged) {
         return;
       }
@@ -692,7 +692,7 @@ export class MemberDialogComponent implements OnDestroy {
     });
 
     if (await firstValueFrom(this.accountDeprovisioningEnabled$)) {
-      await this.deleteManagedUserWarningService.acknowledgeWarning();
+      await this.deleteManagedMemberWarningService.acknowledgeWarning(this.params.organizationId);
     }
     this.close(MemberDialogResult.Deleted);
   };

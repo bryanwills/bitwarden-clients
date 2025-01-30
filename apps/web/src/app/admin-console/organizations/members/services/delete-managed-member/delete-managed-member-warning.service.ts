@@ -1,4 +1,5 @@
 import { Injectable } from "@angular/core";
+import { map } from "rxjs";
 
 import {
   DELETE_MANAGED_USER_WARNING,
@@ -7,7 +8,7 @@ import {
 } from "@bitwarden/common/platform/state";
 import { DialogService } from "@bitwarden/components";
 
-export const SHOW_WARNING_KEY = new UserKeyDefinition<boolean>(
+export const SHOW_WARNING_KEY = new UserKeyDefinition<string[]>(
   DELETE_MANAGED_USER_WARNING,
   "showDeleteManagedUserWarning",
   {
@@ -17,18 +18,27 @@ export const SHOW_WARNING_KEY = new UserKeyDefinition<boolean>(
 );
 
 @Injectable({ providedIn: "root" })
-export class DeleteManagedUserWarningService {
+export class DeleteManagedMemberWarningService {
   private _acknowledged = this.stateProvider.getActive(SHOW_WARNING_KEY);
-
-  acknowledged$ = this._acknowledged.state$;
+  private acknowledgedState$ = this._acknowledged.state$;
 
   constructor(
     private stateProvider: StateProvider,
     private dialogService: DialogService,
   ) {}
 
-  async acknowledgeWarning() {
-    await this._acknowledged.update(() => true);
+  async acknowledgeWarning(organizationId: string) {
+    await this._acknowledged.update((state) => {
+      if (!organizationId) {
+        return state;
+      }
+      if (!state) {
+        return [organizationId];
+      } else if (!state.includes(organizationId)) {
+        return [...state, organizationId];
+      }
+      return state;
+    });
   }
 
   async showWarning() {
@@ -50,5 +60,11 @@ export class DeleteManagedUserWarningService {
     }
 
     return confirmed;
+  }
+
+  warningAcknowledged(organizationId: string) {
+    return this.acknowledgedState$.pipe(
+      map((acknowledgedIds) => acknowledgedIds?.includes(organizationId) ?? false),
+    );
   }
 }

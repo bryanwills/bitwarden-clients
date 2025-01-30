@@ -11,7 +11,7 @@ import { ConfigService } from "@bitwarden/common/platform/abstractions/config/co
 import { I18nService } from "@bitwarden/common/platform/abstractions/i18n.service";
 import { DialogService } from "@bitwarden/components";
 
-import { DeleteManagedUserWarningService } from "../../services/delete-managed-member/delete-managed-member-warning.service";
+import { DeleteManagedMemberWarningService } from "../../services/delete-managed-member/delete-managed-member-warning.service";
 
 import { BulkUserDetails } from "./bulk-status.component";
 
@@ -37,7 +37,7 @@ export class BulkDeleteDialogComponent {
     protected i18nService: I18nService,
     private organizationUserApiService: OrganizationUserApiService,
     private configService: ConfigService,
-    private deleteManagedUserWarningService: DeleteManagedUserWarningService,
+    private deleteManagedMemberWarningService: DeleteManagedMemberWarningService,
   ) {
     this.organizationId = dialogParams.organizationId;
     this.users = dialogParams.users;
@@ -47,7 +47,7 @@ export class BulkDeleteDialogComponent {
     if (
       await firstValueFrom(this.configService.getFeatureFlag$(FeatureFlag.AccountDeprovisioning))
     ) {
-      await this.deleteManagedUserWarningService.acknowledgeWarning();
+      await this.deleteManagedMemberWarningService.acknowledgeWarning(this.organizationId);
     }
 
     try {
