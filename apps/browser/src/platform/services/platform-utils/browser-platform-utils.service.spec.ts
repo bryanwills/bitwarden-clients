@@ -243,6 +243,7 @@ describe("Browser Utils Service", () => {
     });
 
     it("copies the passed text using the offscreen document if the extension is using manifest v3", async () => {
+      BrowserApi.sendMessageWithResponse = jest.fn();
       const text = "test";
       offscreenDocumentService.offscreenApiSupported.mockReturnValue(true);
       getManifestVersionSpy.mockReturnValue(3);
@@ -317,6 +318,7 @@ describe("Browser Utils Service", () => {
     });
 
     it("reads the clipboard text using the offscreen document", async () => {
+      BrowserApi.sendMessageWithResponse = jest.fn();
       offscreenDocumentService.offscreenApiSupported.mockReturnValue(true);
       getManifestVersionSpy.mockReturnValue(3);
       offscreenDocumentService.withDocument.mockImplementationOnce((_, __, callback) =>
