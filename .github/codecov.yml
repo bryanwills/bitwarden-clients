@@ -23,7 +23,7 @@ component_management:
         - apps/browser/src/key-management/lock/**
         - apps/desktop/src/key-management/lock/**
         - apps/web/src/app/key-management/lock/**
-        - libs/key-management/src/angular/lock/**
+        - libs/key-management-ui/src/lock/**
     - component_id: key-management-ipc
       name: Key Management - IPC
       paths:
@@ -63,3 +63,4 @@ component_management:
         - apps/web/src/app/key-managemen/**
         - libs/common/src/key-management/**
         - libs/key-management/**
+        - libs/key-management-ui/**
