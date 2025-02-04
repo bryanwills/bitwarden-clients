@@ -147,7 +147,9 @@ describe("Browser Utils Service", () => {
 
   describe("isViewOpen", () => {
     it("returns false if a heartbeat response is not received", async () => {
-      BrowserApi.sendMessageWithResponse = jest.fn().mockResolvedValueOnce(undefined);
+      chrome.runtime.sendMessage = jest.fn().mockImplementation((message, callback) => {
+        callback(undefined);
+      });
 
       const isViewOpen = await browserPlatformUtilsService.isViewOpen();
 
@@ -155,15 +157,28 @@ describe("Browser Utils Service", () => {
     });
 
     it("returns true if a heartbeat response is received", async () => {
-      BrowserApi.sendMessageWithResponse = jest
-        .fn()
-        .mockImplementationOnce((subscriber) =>
-          Promise.resolve((subscriber === "checkVaultPopupHeartbeat") as any),
-        );
+      chrome.runtime.sendMessage = jest.fn().mockImplementation((message, callback) => {
+        callback(message.command === "checkVaultPopupHeartbeat");
+      });
 
       const isViewOpen = await browserPlatformUtilsService.isViewOpen();
 
       expect(isViewOpen).toBe(true);
+    });
+
+    it("returns false if special error is sent", async () => {
+      chrome.runtime.sendMessage = jest.fn().mockImplementation((message, callback) => {
+        chrome.runtime.lastError = new Error(
+          "Could not establish connection. Receiving end does not exist.",
+        );
+        callback(undefined);
+      });
+
+      const isViewOpen = await browserPlatformUtilsService.isViewOpen();
+
+      expect(isViewOpen).toBe(false);
+
+      chrome.runtime.lastError = null;
     });
   });
 
