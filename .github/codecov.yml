@@ -45,6 +45,7 @@ component_management:
       paths:
         - libs/key-management/src/kdf-config.service.ts
         - libs/key-management/src/key.service.ts
+        - libs/common/src/key-management/master-password/**
     - component_id: key-management-crypto
       name: Key Management - Crypto
       paths:
